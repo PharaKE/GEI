@@ -464,7 +464,7 @@ function updateComparison() {
   charts.cmpRadar = new Chart(rCtx, {
     type:'radar',
     data:{ labels:PILLAR_LABELS, datasets:cs.map((c,i)=>({ label:c.country, data:PILLARS.map(p=>c[p]||0), backgroundColor:palette[i].bg, borderColor:palette[i].border, pointBackgroundColor:palette[i].border, borderWidth:2, pointRadius:3 })) },
-    options:{ scales:{r:{min:0,max:100,ticks:{stepSize:20,font:{family:'Poppins',size:8}},pointLabels:{font:{family:'Poppins',size:9,weight:'600'}}}}, plugins:{legend:{position:'bottom',labels:{font:{family:'Poppins',size:10},padding:10}}}, responsive:true, maintainAspectRatio:window.innerWidth>768, aspectRatio:window.innerWidth>768?3:1.1}
+    options:{ scales:{r:{min:0,max:100,ticks:{stepSize:20,font:{family:'Poppins',size:8}},pointLabels:{font:{family:'Poppins',size:9,weight:'600'}}}}, plugins:{legend:{position:'bottom',labels:{font:{family:'Poppins',size:10},padding:10}}}, responsive:true, maintainAspectRatio:true, aspectRatio: 3}
   });
 
   // Trend
@@ -482,7 +482,7 @@ function updateComparison() {
   charts.cmpBar = new Chart(bCtx, {
     type:'bar',
     data:{ labels:PILLAR_LABELS, datasets:cs.map((c,i)=>({ label:c.country, data:PILLARS.map(p=>c[p]||0), backgroundColor:palette[i].bg.replace('0.15','0.65').replace('0.12','0.65'), borderColor:palette[i].border, borderWidth:2, borderRadius:5 })) },
-    options:{ scales:{y:{beginAtZero:true,max:100,grid:{color:'rgba(26,107,181,0.07)'},ticks:{font:{family:'Poppins',size:8}}},x:{grid:{display:false},ticks:{font:{family:'Poppins',size:9}}}}, plugins:{legend:{position:'bottom',labels:{font:{family:'Poppins',size:10}}}}, responsive:true, maintainAspectRatio:window.innerWidth>768, aspectRatio:window.innerWidth>768?3:1.0}
+    options:{ scales:{y:{beginAtZero:true,max:100,grid:{color:'rgba(26,107,181,0.07)'},ticks:{font:{family:'Poppins',size:8}}},x:{grid:{display:false},ticks:{font:{family:'Poppins',size:9}}}}, plugins:{legend:{position:'bottom',labels:{font:{family:'Poppins',size:10}}}}, responsive:true, maintainAspectRatio:true}
   });
 }
 
