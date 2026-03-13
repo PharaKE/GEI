@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KE · Global Entrepreneurship Index 2025</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<link rel="stylesheet" href="/index.css">
+<link rel="icon" type="image/x-icon" href="images/favicon.ico">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+</head>
+<body>
+
+<!-- LOADER -->
+<div class="loader-overlay" id="loader">
+  <img src="/images/logo_KE.png" alt="KE Logo" style="width:55px;opacity:0.7;margin-bottom:8px">
+  <div class="loader-spinner"></div>
+  <div class="loader-text">Loading Entrepreneurship Data...</div>
+</div>
+
+<div id="app">
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="/images/logo_KE.png" alt="Khmer Enterprise Logo">
+      <div class="sidebar-logo-text">
+        <div class="ke">Khmer Enterprise</div>
+        <div class="sub">Global Entrepreneurship<br>Intelligence Platform</div>
+      </div>
+      <button class="sidebar-close-btn" onclick="toggleMobileSidebar()" aria-label="Close menu">✕</button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <div class="nav-item active" onclick="showPage('overview')"><span class="icon">🌏</span> Global Overview</div>
+      <div class="nav-item" onclick="showPage('comparison')"><span class="icon">⚖️</span> Country Compare</div>
+      <div class="nav-item" onclick="showPage('country-detail')"><span class="icon">🔍</span> Country Detail</div>
+      <div class="nav-section">Insights</div>
+      <div class="nav-item" onclick="showPage('insights')"><span class="icon">📋</span> Report Findings</div>
+      <div class="nav-section">Focus</div>
+      <div class="nav-item" onclick="showPage('cambodia')"><span class="icon">🇰🇭</span> Cambodia Focus</div>
+    </nav>
+    <div class="sidebar-footer">
+      <p>Data: Opinium Global Entrepreneurship Index 2025 · 137 markets · 15 years</p>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileSidebar()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="topbar-title">Global <span>Entrepreneurship</span> Intelligence</div>
+      <div class="topbar-right">
+        <span class="badge-source">Opinium GEI 2025</span>
+        <span class="badge-year">📊 2025</span>
+      </div>
+    </div>
+
+    <!-- ══════════════ PAGE: OVERVIEW ══════════════ -->
+    <div class="page active fade-in" id="page-overview">
+      <div class="section-title"><span>Global</span> Entrepreneurship Overview</div>
+      <div class="section-sub">137 markets ranked across 5 pillars · Slicer by Country, Region & Income Type</div>
+
+      <div class="filters-row">
+        <div class="filter-group">
+          <div class="filter-label">Region</div>
+          <select class="filter-select" id="filter-region" onchange="applyFilters()"><option value="">All Regions</option></select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Income Type</div>
+          <select class="filter-select" id="filter-income" onchange="applyFilters()"><option value="">All Income Types</option></select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Country Search</div>
+          <select class="filter-select" id="filter-country" onchange="applyFilters()"><option value="">All Countries</option></select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">&nbsp;</div>
+          <button class="filter-btn" onclick="resetFilters()">↺ Reset</button>
+        </div>
+      </div>
+
+      <!-- KPI CARDS -->
+      <div class="kpi-grid fade-in stagger-1" id="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon">🌐</div>
+          <div class="kpi-label">Markets Ranked</div>
+          <div class="kpi-value blue" id="kpi-count">137</div>
+          <div class="kpi-sub">Countries in Index</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">📈</div>
+          <div class="kpi-label">Avg Index Score</div>
+          <div class="kpi-value green" id="kpi-avg">—</div>
+          <div class="kpi-sub">Out of 100</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">🏆</div>
+          <div class="kpi-label">Top Performer</div>
+          <div class="kpi-value" id="kpi-top" style="font-size:17px;color:var(--green-dark)">—</div>
+          <div class="kpi-sub" id="kpi-top-score">Score: —</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">🇰🇭</div>
+          <div class="kpi-label">Cambodia Rank</div>
+          <div class="kpi-value orange" id="kpi-cambodia-rank">—</div>
+          <div class="kpi-sub" id="kpi-cambodia-score">Score: 37/100</div>
+        </div>
+      </div>
+
+      <!-- MAP + TOP LIST -->
+      <div class="grid-2-1 fade-in stagger-2">
+        <div class="glass-card">
+          <div class="card-title"><div class="card-title-dot blue"></div>World Entrepreneurship Map</div>
+          <div id="world-map"></div>
+          <div style="font-size:9.5px;color:var(--text-light);margin-top:6px;text-align:center">Click any country for details · Color = Income Type · Shade = Score Level</div>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:5px;font-size:9px">
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#1a6bb5;display:inline-block"></span>High Income</span>
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#27a891;display:inline-block"></span>Upper Middle</span>
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#c8a800;display:inline-block"></span>Lower Middle</span>
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#c86432;display:inline-block"></span>Low Income</span>
+          </div>
+        </div>
+        <div class="glass-card">
+          <div class="card-title"><div class="card-title-dot green"></div>Top 20 Countries</div>
+          <div class="table-container" style="max-height:320px;overflow-y:auto">
+            <table class="data-table" id="top-table">
+              <thead><tr><th>#</th><th>Country</th><th>Score</th></tr></thead>
+              <tbody id="top-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- REGION + INCOME CHARTS -->
+      <div class="grid-2 fade-in stagger-3">
+        <div class="glass-card">
+          <div class="card-title"><div class="card-title-dot blue"></div>Average Score by Region</div>
+          <canvas id="regionChart" height="110"></canvas>
+        </div>
+        <div class="glass-card">
+          <div class="card-title"><div class="card-title-dot yellow"></div>Average Score by Income Type</div>
+          <canvas id="incomeChart" height="110"></canvas>
+        </div>
+      </div>
+
+      <!-- PILLAR RADAR + DISTRIBUTION -->
+      <div class="grid-2 fade-in stagger-4">
+        <div class="glass-card">
+          <div class="card-title"><div class="card-title-dot green"></div>Pillar Scores — Filtered Average</div>
+          <canvas id="pillarRadar" height="140"></canvas>
+        </div>
+        <div class="glass-card">
+          <div class="card-title"><div class="card-title-dot blue"></div>Score Distribution</div>
+          <canvas id="distributionChart" height="140"></canvas>
+        </div>
+      </div>
+
+      <!-- FULL TABLE — with ranking column -->
+      <div class="glass-card full-width fade-in">
+        <div class="card-title"><div class="card-title-dot green"></div>All Countries — Filtered Data</div>
+        <div class="pillar-tab-bar">
+          <button class="pillar-tab active" onclick="setTablePillar('index_score')" id="ptab-index_score">🌐 Index Score</button>
+          <button class="pillar-tab" onclick="setTablePillar('economic')" id="ptab-economic">💰 Economic</button>
+          <button class="pillar-tab" onclick="setTablePillar('human_capital')" id="ptab-human_capital">👥 Human Capital</button>
+          <button class="pillar-tab" onclick="setTablePillar('connectedness')" id="ptab-connectedness">🔗 Connected</button>
+          <button class="pillar-tab" onclick="setTablePillar('governance')" id="ptab-governance">⚖️ Governance</button>
+          <button class="pillar-tab" onclick="setTablePillar('market_potential')" id="ptab-market_potential">🛒 Market</button>
+        </div>
+        <div class="table-container" style="max-height:380px;overflow-y:auto">
+          <table class="data-table" id="main-table">
+            <thead>
+              <tr>
+                <th>Rank</th><th>Country</th><th>Region</th><th>Income</th>
+                <th id="main-table-score-header">Index Score</th><th>Economic</th><th>Human Capital</th>
+                <th>Connected</th><th>Governance</th><th>Market</th>
+              </tr>
+            </thead>
+            <tbody id="main-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ PAGE: COMPARISON ══════════════ -->
+    <div class="page fade-in" id="page-comparison">
+      <div class="section-title"><span>Country</span> Comparison</div>
+      <div class="section-sub">Compare up to 3 countries across all 5 pillars and global index score</div>
+      <div class="comparison-selectors">
+        <div class="country-selector-card">
+          <span class="country-selector-label c1">Country 1 (Green)</span>
+          <select class="filter-select" id="cmp-c1" style="min-width:175px" onchange="updateComparison()"><option value="">Select Country</option></select>
+        </div>
+        <div class="country-selector-card">
+          <span class="country-selector-label c2">Country 2 (Blue)</span>
+          <select class="filter-select" id="cmp-c2" style="min-width:175px" onchange="updateComparison()"><option value="">Select Country</option></select>
+        </div>
+        <div class="country-selector-card">
+          <span class="country-selector-label c3">Country 3 (Yellow)</span>
+          <select class="filter-select" id="cmp-c3" style="min-width:175px" onchange="updateComparison()"><option value="">Select Country</option></select>
+        </div>
+      </div>
+      <div id="cmp-kpi-row" class="kpi-grid" style="grid-template-columns:repeat(3,1fr)"></div>
+      <div class="grid-2" style="margin-top:12px">
+        <div class="glass-card">
+          <div class="card-title"><div class="card-title-dot green"></div>Pillar Score Radar</div>
+          <canvas id="cmpRadar" height="160"></canvas>
+        </div>
+        <div class="glass-card">
+          <div class="card-title"><div class="card-title-dot blue"></div>Historical Index Score (2011–2025)</div>
+          <canvas id="cmpTrend" height="160"></canvas>
+        </div>
+      </div>
+      <div class="glass-card full-width">
+        <div class="card-title"><div class="card-title-dot yellow"></div>Pillar-by-Pillar Bar Comparison</div>
+        <canvas id="cmpBar" height="100"></canvas>
+      </div>
+    </div>
+
+    <!-- ══════════════ PAGE: COUNTRY DETAIL ══════════════ -->
+    <div class="page fade-in" id="page-country-detail">
+      <div class="section-title"><span>Country</span> Detail View</div>
+      <div class="section-sub">Select any country to see full profile, pillar breakdown and historical trend</div>
+      <div class="filters-row">
+        <div class="filter-group">
+          <div class="filter-label">Select Country</div>
+          <select class="filter-select" id="detail-country" style="min-width:220px" onchange="showCountryDetail()"><option value="">Choose Country…</option></select>
+        </div>
+      </div>
+      <div id="country-detail-content" style="display:none">
+        <div class="detail-hero fade-in">
+          <div class="detail-hero-name" id="dh-name">—</div>
+          <div class="detail-hero-sub" id="dh-sub">—</div>
+          <div class="detail-hero-score"><span id="dh-score">—</span><span>/100</span></div>
+          <div class="detail-hero-meta" id="dh-meta"></div>
+        </div>
+        <div class="pillar-grid fade-in">
+          <div class="pillar-card"><div class="pillar-icon">💰</div><div class="pillar-name">Economic & Financial</div><div class="pillar-value" id="p-eco">—</div></div>
+          <div class="pillar-card"><div class="pillar-icon">👥</div><div class="pillar-name">Human Capital</div><div class="pillar-value" id="p-hum">—</div></div>
+          <div class="pillar-card"><div class="pillar-icon">🔗</div><div class="pillar-name">Connectedness</div><div class="pillar-value" id="p-con">—</div></div>
+          <div class="pillar-card"><div class="pillar-icon">⚖️</div><div class="pillar-name">Governance</div><div class="pillar-value" id="p-gov">—</div></div>
+          <div class="pillar-card"><div class="pillar-icon">🛒</div><div class="pillar-name">Market Potential</div><div class="pillar-value" id="p-mkt">—</div></div>
+        </div>
+        <div class="grid-2">
+          <div class="glass-card">
+            <div class="card-title"><div class="card-title-dot green"></div>Pillar Profile (Radar)</div>
+            <canvas id="detailRadar" height="150"></canvas>
+          </div>
+          <div class="glass-card">
+            <div class="card-title"><div class="card-title-dot blue"></div>Index Score Trend (2011–2025)</div>
+            <canvas id="detailTrend" height="150"></canvas>
+          </div>
+        </div>
+        <div class="glass-card full-width">
+          <div class="card-title"><div class="card-title-dot yellow"></div>Country Insight</div>
+          <div id="dh-detail" style="font-size:12.5px;color:var(--text-mid);line-height:1.8;padding:4px 0"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ PAGE: INSIGHTS ══════════════ -->
+    <div class="page fade-in" id="page-insights">
+      <div class="insight-hero">
+        <h1>📋 Opinium Global Entrepreneurship Index 2025</h1>
+        <p>A strategic analysis of 137 global markets benchmarked across 15 years. Key findings on what drives — and hinders — entrepreneurship worldwide.</p>
+        <div class="meta">
+          <span class="insight-meta-badge">📅 2025 Edition</span>
+          <span class="insight-meta-badge">🌍 137 Markets</span>
+          <span class="insight-meta-badge">📊 26 Indicators</span>
+          <span class="insight-meta-badge">⏱ 15 Year Track</span>
+          <span class="insight-meta-badge">5 Pillars</span>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-bottom:5px"><span>Key</span> Findings</div>
+      <div class="section-sub">Six headline conclusions from the 2025 report</div>
+      <div class="finding-grid fade-in">
+        <div class="finding-card">
+          <div class="finding-num green">01</div>
+          <div class="finding-title">West Retains Overall Lead — For Now</div>
+          <div class="finding-text">North America and Europe maintain top positions with North America scoring <strong>77/100</strong>. However, East Asia & Pacific is closing rapidly, now at 60/100 vs Europe's 66/100.</div>
+        </div>
+        <div class="finding-card">
+          <div class="finding-num blue">02</div>
+          <div class="finding-title">Asian Tigers Dominate Elite Rankings</div>
+          <div class="finding-text">Singapore (#1, 96/100) and Hong Kong (#2, 94/100) hold the top. Macao ranks 4th. The Nordics — Denmark (#3), Sweden (#6) — lead Europe. All Nordic & Benelux nations rank in the global Top 20.</div>
+        </div>
+        <div class="finding-card">
+          <div class="finding-num yellow">03</div>
+          <div class="finding-title">UK Stuck Outside Top 20 for 6 Years</div>
+          <div class="finding-text">The UK ranks 23rd at <strong>79/100</strong>, down 3 pts from 2011. Connectedness dropped 9 pts due to lagging digital infrastructure. Strong governance (88/100) isn't enough to break back in.</div>
+        </div>
+        <div class="finding-card">
+          <div class="finding-num green">04</div>
+          <div class="finding-title">EU Losing Edge to APAC Competition</div>
+          <div class="finding-text">The EU's average dropped 3 pts to <strong>74/100</strong>. Economic & Financial Access fell 8 pts, linked to post-2008 austerity and tighter banking regulations.</div>
+        </div>
+        <div class="finding-card">
+          <div class="finding-num blue">05</div>
+          <div class="finding-title">USA Falls to Rank 30 Despite Strength</div>
+          <div class="finding-text">The US scores <strong>75/100</strong>, ranking 30th. Financial strength (86/100) is offset by Human Capital challenges (-8 pts since 2011) and trade barriers.</div>
+        </div>
+        <div class="finding-card">
+          <div class="finding-num yellow">06</div>
+          <div class="finding-title">Gender Gap Remains Critical</div>
+          <div class="finding-text">Women received just <strong>1.8% of equity investment in H1 2024</strong>. The Invest in Women Taskforce has committed over £250m to address this structural gap.</div>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-bottom:5px;margin-top:6px"><span>Strategic</span> Takeaways</div>
+      <div class="section-sub">Actionable insights for policymakers, investors and entrepreneurs</div>
+      <div class="key-takeaway fade-in">
+        <div class="takeaway-icon">🏗️</div>
+        <div><div class="takeaway-title">Infrastructure Investment is Non-Negotiable</div><div class="takeaway-text">Countries falling in Connectedness — UK (-9 pts) and EU (-7 pts) — show digital infrastructure is no longer optional. Full-fibre broadband, 5G, and electricity access directly correlate with startup density.</div></div>
+      </div>
+      <div class="key-takeaway fade-in">
+        <div class="takeaway-icon">💰</div>
+        <div><div class="takeaway-title">Access to Finance Remains the #1 Structural Barrier</div><div class="takeaway-text">The EU's 8-point decline in Economic & Financial Access reflects a global truth: post-crisis austerity disproportionately hurts entrepreneurs who rely on credit, equity, and government-backed lending.</div></div>
+      </div>
+      <div class="key-takeaway fade-in">
+        <div class="takeaway-icon">🌏</div>
+        <div><div class="takeaway-title">Asia-Pacific is the World's Rising Entrepreneurship Powerhouse</div><div class="takeaway-text">Singapore and Hong Kong's sustained leadership reflects deliberate policy choices. The UAE (now #11, up 12 places since 2011) shows rapid reform can shift rankings dramatically within a decade.</div></div>
+      </div>
+      <div class="key-takeaway fade-in">
+        <div class="takeaway-icon">🇰🇭</div>
+        <div><div class="takeaway-title">Cambodia's Path: From 23 to 37 — Growth Trajectory but Governance Gap</div><div class="takeaway-text">Cambodia improved 14 points since 2011 — one of the best growth stories in Southeast Asia. Economic & Financial Access (51/100) is strong. However, a governance score of 17/100 is the single largest constraint.</div></div>
+      </div>
+      <div class="key-takeaway fade-in">
+        <div class="takeaway-icon">⚡</div>
+        <div><div class="takeaway-title">Geopolitical Instability Destroys Entrepreneurial Momentum Rapidly</div><div class="takeaway-text">Russia's 18-place drop (to rank 79) is the most dramatic example. Hungary (-11) and Poland (-7) also show how policy uncertainty translates almost immediately into weaker entrepreneurial environments.</div></div>
+      </div>
+
+      <div class="section-title" style="margin-bottom:5px;margin-top:6px"><span>Regional</span> Scoreboard 2025</div>
+      <div class="glass-card full-width fade-in">
+        <div class="card-title"><div class="card-title-dot blue"></div>Continental Performance Across All 5 Pillars</div>
+        <canvas id="regionalPillarChart" height="120"></canvas>
+      </div>
+
+      <div class="section-title" style="margin-bottom:5px;margin-top:6px"><span>Global</span> League Table</div>
+      <div class="grid-2 fade-in">
+        <div class="glass-card">
+          <div class="card-title"><div class="card-title-dot green"></div>🏆 Top 20 Markets 2025</div>
+          <div id="insight-top-20"></div>
+        </div>
+        <div class="glass-card">
+          <div class="card-title"><div class="card-title-dot green"></div>⬆️ Rising Stars 2025</div>
+          <div id="insight-rising"></div>
+          <div class="card-title" style="margin-top:14px"><div class="card-title-dot" style="background:#e05252"></div>⬇️ Biggest Declines 2025</div>
+          <div id="insight-falling"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ PAGE: CAMBODIA ══════════════ -->
+    <div class="page fade-in" id="page-cambodia">
+      <div class="section-title">🇰🇭 <span>Cambodia</span> Entrepreneurship Focus</div>
+      <div class="section-sub">In-depth analysis of Cambodia's position in the Global Entrepreneurship Index 2025</div>
+
+      <div class="detail-hero fade-in" style="background:linear-gradient(135deg,#0d6e42 0%,#1a6bb5 100%)">
+        <div class="detail-hero-name">🇰🇭 Kingdom of Cambodia</div>
+        <div class="detail-hero-sub">East Asia & Pacific · Lower Middle Income</div>
+        <div class="detail-hero-score" id="cam-score">37<span>/100</span></div>
+        <div class="detail-hero-meta">
+          <div class="detail-meta-item"><strong id="cam-rank">~101st</strong>Global Rank</div>
+          <div class="detail-meta-item"><strong>+14 pts</strong>Since 2011</div>
+          <div class="detail-meta-item"><strong>23 → 37</strong>Score Growth</div>
+          <div class="detail-meta-item"><strong>51/100</strong>Economic Access</div>
+          <div class="detail-meta-item"><strong>17/100</strong>Governance</div>
+        </div>
+      </div>
+
+      <div class="pillar-grid fade-in">
+        <div class="pillar-card"><div class="pillar-icon">💰</div><div class="pillar-name">Economic & Financial</div><div class="pillar-value" style="color:var(--green-dark)">51</div><div style="font-size:9px;color:var(--text-light);margin-top:3px">Strongest Pillar</div></div>
+        <div class="pillar-card"><div class="pillar-icon">👥</div><div class="pillar-name">Human Capital</div><div class="pillar-value" style="color:var(--blue-dark)">37</div><div style="font-size:9px;color:var(--text-light);margin-top:3px">Below Average</div></div>
+        <div class="pillar-card"><div class="pillar-icon">🔗</div><div class="pillar-name">Connectedness</div><div class="pillar-value" style="color:var(--blue-dark)">43</div><div style="font-size:9px;color:var(--text-light);margin-top:3px">Improving</div></div>
+        <div class="pillar-card"><div class="pillar-icon">⚖️</div><div class="pillar-name">Governance</div><div class="pillar-value" style="color:#e05252">17</div><div style="font-size:9px;color:#e05252;margin-top:3px">Critical Gap</div></div>
+        <div class="pillar-card"><div class="pillar-icon">🛒</div><div class="pillar-name">Market Potential</div><div class="pillar-value" style="color:var(--blue-dark)">38</div><div style="font-size:9px;color:var(--text-light);margin-top:3px">Growing</div></div>
+      </div>
+
+      <div class="grid-2 fade-in">
+        <div class="glass-card">
+          <div class="card-title"><div class="card-title-dot green"></div>Cambodia Score Trend 2011–2025</div>
+          <canvas id="camTrend" height="140"></canvas>
+        </div>
+        <div class="glass-card">
+          <div class="card-title"><div class="card-title-dot blue"></div>Cambodia vs Regional Neighbors</div>
+          <canvas id="camCompare" height="140"></canvas>
+        </div>
+      </div>
+
+      <div class="glass-card full-width fade-in">
+        <div class="card-title"><div class="card-title-dot yellow"></div>Cambodia's Pillar Profile vs Southeast Asian Peers</div>
+        <canvas id="camRadar" height="120"></canvas>
+      </div>
+
+      <div class="glass-card full-width fade-in" style="margin-top:13px">
+        <div class="card-title"><div class="card-title-dot green"></div>🇰🇭 Strategic Analysis for Khmer Enterprise</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:4px 0">
+          <div>
+            <div style="font-size:12.5px;font-weight:700;color:var(--green-dark);margin-bottom:9px">✅ Strengths & Opportunities</div>
+            <div style="font-size:11.5px;color:var(--text-mid);line-height:1.85">
+              <strong>• Strong Growth Momentum:</strong> 14-point gain since 2011 — one of SEA's best improvement stories.<br><br>
+              <strong>• Financial Access Surprise:</strong> Score of 51/100 in Economic & Financial Access outperforms the overall index, suggesting the financial ecosystem is developing faster than governance.<br><br>
+              <strong>• Digital Economy Entry:</strong> Connectedness at 43/100 shows rapid mobile adoption — fertile ground for digital entrepreneurs and fintech innovators.<br><br>
+              <strong>• Young Demographics:</strong> Cambodia's young population creates a growing consumer market and expanding labour pool for Human Capital improvement.
+            </div>
+          </div>
+          <div>
+            <div style="font-size:12.5px;font-weight:700;color:#e05252;margin-bottom:9px">⚠️ Challenges & Priority Areas</div>
+            <div style="font-size:11.5px;color:var(--text-mid);line-height:1.85">
+              <strong>• Governance Gap (17/100):</strong> Cambodia's most critical constraint. Rule of law, corruption control, and regulatory transparency must improve to advance beyond rank 100.<br><br>
+              <strong>• Market Potential (38/100):</strong> Limited trade intensity and domestic market size constrain entrepreneur scale-up. Regional economic integration is key.<br><br>
+              <strong>• Skills & Human Capital (37/100):</strong> Investment in digital skills, STEM education, and vocational training is essential for building the talent pipeline.<br><br>
+              <strong>• KE Priority:</strong> Programs addressing governance literacy, cross-border trade facilitation, and digital skills align with Cambodia's highest-leverage improvement areas.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav" id="mobileBottomNav">
+  <button class="mob-nav-item active" onclick="showPage('overview')" data-page="overview">
+    <span class="mob-nav-icon">🌏</span>
+    <span class="mob-nav-label">Overview</span>
+  </button>
+  <button class="mob-nav-item" onclick="showPage('comparison')" data-page="comparison">
+    <span class="mob-nav-icon">⚖️</span>
+    <span class="mob-nav-label">Compare</span>
+  </button>
+  <button class="mob-nav-item" onclick="showPage('country-detail')" data-page="country-detail">
+    <span class="mob-nav-icon">🔍</span>
+    <span class="mob-nav-label">Country</span>
+  </button>
+  <button class="mob-nav-item" onclick="showPage('insights')" data-page="insights">
+    <span class="mob-nav-icon">📋</span>
+    <span class="mob-nav-label">Insights</span>
+  </button>
+  <button class="mob-nav-item" onclick="showPage('cambodia')" data-page="cambodia">
+    <span class="mob-nav-icon">🇰🇭</span>
+    <span class="mob-nav-label">Cambodia</span>
+  </button>
+</nav>
+
+<script src="/index.js"></script>
+</body>
+</html>
