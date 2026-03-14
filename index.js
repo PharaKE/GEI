@@ -280,7 +280,7 @@ function renderRegionChart(data) {
       borderColor: labels.map((_,i)=>REGION_COLORS[i%REGION_COLORS.length]),
       borderWidth:2, borderRadius:7
     }] },
-    options:{ plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,max:100,grid:{color:'rgba(26,107,181,0.07)'},ticks:{font:{family:'Poppins',size:9}}},x:{grid:{display:false},ticks:{font:{family:'Poppins',size:8}}}}, responsive:true, maintainAspectRatio:true }
+    options:{ plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,max:100,grid:{color:'rgba(26,107,181,0.07)'},ticks:{font:{family:'Poppins',size:9}}},x:{grid:{display:false},ticks:{font:{family:'Poppins',size:8}}}}, responsive:true, maintainAspectRatio:true, aspectRatio:window.innerWidth>768?2:2.1}
   });
 }
 
@@ -297,7 +297,7 @@ function renderIncomeChart(data) {
   charts.income = new Chart(ctx, {
     type:'doughnut',
     data:{ labels, datasets:[{ data:avgs, backgroundColor:incomeColors.map(c=>c+'cc'), borderColor:incomeColors, borderWidth:2.5, hoverOffset:8 }] },
-    options:{ plugins:{ legend:{position:'bottom',labels:{font:{family:'Poppins',size:10},padding:10,usePointStyle:true}}, tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.parsed}/100 avg`}} }, responsive:true, maintainAspectRatio:true, aspectRatio: 3}
+    options:{ plugins:{ legend:{position:'bottom',labels:{font:{family:'Poppins',size:10},padding:10,usePointStyle:true}}, tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.parsed}/100 avg`}} }, responsive:true, maintainAspectRatio:true, aspectRatio:window.innerWidth>768?2:2.1}
   });
 }
 
@@ -310,7 +310,7 @@ function renderPillarRadar(data) {
   charts.radar = new Chart(ctx, {
     type:'radar',
     data:{ labels:PILLAR_LABELS, datasets:[{ label:'Average Score', data:avgs, backgroundColor:'rgba(26,155,95,0.18)', borderColor:'rgba(26,155,95,0.9)', pointBackgroundColor:'rgba(26,155,95,1)', borderWidth:2, pointRadius:3 }] },
-    options:{ scales:{r:{min:0,max:100,ticks:{stepSize:20,font:{family:'Poppins',size:8}},grid:{color:'rgba(26,107,181,0.10)'},pointLabels:{font:{family:'Poppins',size:9}}}}, plugins:{legend:{display:false}}, responsive:true, maintainAspectRatio:true, aspectRatio: 3}
+    options:{ scales:{r:{min:0,max:100,ticks:{stepSize:20,font:{family:'Poppins',size:8}},grid:{color:'rgba(26,107,181,0.10)'},pointLabels:{font:{family:'Poppins',size:9}}}}, plugins:{legend:{display:false}}, responsive:true, maintainAspectRatio:true, aspectRatio:window.innerWidth>768?2:2.1}
   });
 }
 
@@ -325,7 +325,7 @@ function renderDistribution(data) {
   charts.dist=new Chart(ctx,{
     type:'bar',
     data:{labels,datasets:[{label:'Countries',data:counts,backgroundColor:'rgba(26,107,181,0.55)',borderColor:'rgba(26,107,181,0.8)',borderWidth:2,borderRadius:5}]},
-    options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(26,107,181,0.07)'},ticks:{font:{family:'Poppins',size:9}}},x:{grid:{display:false},ticks:{font:{family:'Poppins',size:8}}}},responsive:true,maintainAspectRatio:true}
+    options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(26,107,181,0.07)'},ticks:{font:{family:'Poppins',size:9}}},x:{grid:{display:false},ticks:{font:{family:'Poppins',size:8}}}},responsive:true,maintainAspectRatio:true, aspectRatio:window.innerWidth>768?2:2.1}
   });
 }
 
@@ -414,7 +414,7 @@ function showCountryDetail() {
   charts.detailRadar = new Chart(rCtx, {
     type:'radar',
     data:{ labels:PILLAR_LABELS, datasets:[{ label:c.country, data:PILLARS.map(p=>c[p]||0), backgroundColor:'rgba(26,155,95,0.18)', borderColor:'rgba(26,155,95,0.9)', pointBackgroundColor:'#1a9b5f', borderWidth:2, pointRadius:4 }] },
-    options:{ scales:{r:{min:0,max:100,ticks:{stepSize:20,font:{family:'Poppins',size:8}},pointLabels:{font:{family:'Poppins',size:9}}}}, plugins:{legend:{display:false}}, responsive:true, maintainAspectRatio:true, aspectRatio:2}
+    options:{ scales:{r:{min:0,max:100,ticks:{stepSize:20,font:{family:'Poppins',size:8}},pointLabels:{font:{family:'Poppins',size:9}}}}, plugins:{legend:{display:false}}, responsive:true, maintainAspectRatio:true, aspectRatio:window.innerWidth>768?2:1.1}
   });
 
   const hist = GEI.historical[c.country]||{};
@@ -424,7 +424,7 @@ function showCountryDetail() {
   charts.detailTrend = new Chart(tCtx, {
     type:'line',
     data:{ labels:YEARS, datasets:[{ label:c.country, data:trendData, borderColor:'rgba(26,107,181,0.9)', backgroundColor:'rgba(26,107,181,0.10)', fill:true, tension:0.4, borderWidth:2, pointRadius:3 }] },
-    options:{ scales:{y:{min:0,max:100,grid:{color:'rgba(26,107,181,0.07)'},ticks:{font:{family:'Poppins',size:8}}},x:{grid:{display:false},ticks:{font:{family:'Poppins',size:8}}}}, plugins:{legend:{display:false}}, responsive:true, maintainAspectRatio:true, aspectRatio:2}
+    options:{ scales:{y:{min:0,max:100,grid:{color:'rgba(26,107,181,0.07)'},ticks:{font:{family:'Poppins',size:8}}},x:{grid:{display:false},ticks:{font:{family:'Poppins',size:8}}}}, plugins:{legend:{display:false}}, responsive:true, maintainAspectRatio:true, aspectRatio:window.innerWidth>768?2:1.1}
   });
 }
 
@@ -464,7 +464,7 @@ function updateComparison() {
   charts.cmpRadar = new Chart(rCtx, {
     type:'radar',
     data:{ labels:PILLAR_LABELS, datasets:cs.map((c,i)=>({ label:c.country, data:PILLARS.map(p=>c[p]||0), backgroundColor:palette[i].bg, borderColor:palette[i].border, pointBackgroundColor:palette[i].border, borderWidth:2, pointRadius:3 })) },
-    options:{ scales:{r:{min:0,max:100,ticks:{stepSize:20,font:{family:'Poppins',size:8}},pointLabels:{font:{family:'Poppins',size:9,weight:'600'}}}}, plugins:{legend:{position:'bottom',labels:{font:{family:'Poppins',size:10},padding:10}}}, responsive:true, maintainAspectRatio:window.innerWidth>768, aspectRatio:window.innerWidth>768?3:1.1}
+    options:{ scales:{r:{min:0,max:100,ticks:{stepSize:20,font:{family:'Poppins',size:8}},pointLabels:{font:{family:'Poppins',size:9,weight:'600'}}}}, plugins:{legend:{position:'bottom',labels:{font:{family:'Poppins',size:10},padding:10}}}, responsive:true, maintainAspectRatio:true, aspectRatio:window.innerWidth>768?2:2.1}
   });
 
   // Trend
@@ -473,7 +473,7 @@ function updateComparison() {
   charts.cmpTrend = new Chart(tCtx, {
     type:'line',
     data:{ labels:YEARS, datasets:cs.map((c,i)=>{ const hist=GEI.historical[c.country]||{}; return { label:c.country, data:YEARS.map(y=>hist[y]||null), borderColor:palette[i].border, backgroundColor:palette[i].bg, fill:false, tension:0.4, borderWidth:2, pointRadius:3 }; }) },
-    options:{ scales:{y:{min:0,max:100,grid:{color:'rgba(26,107,181,0.07)'},ticks:{font:{family:'Poppins',size:8}}},x:{grid:{display:false},ticks:{font:{family:'Poppins',size:8}}}}, plugins:{legend:{position:'bottom',labels:{font:{family:'Poppins',size:10}}}}, responsive:true, maintainAspectRatio:true}
+    options:{ scales:{y:{min:0,max:100,grid:{color:'rgba(26,107,181,0.07)'},ticks:{font:{family:'Poppins',size:8}}},x:{grid:{display:false},ticks:{font:{family:'Poppins',size:8}}}}, plugins:{legend:{position:'bottom',labels:{font:{family:'Poppins',size:10}}}}, responsive:true, maintainAspectRatio:true, aspectRatio:window.innerWidth>768?2:2.1}
   });
 
   // Bar
@@ -482,7 +482,7 @@ function updateComparison() {
   charts.cmpBar = new Chart(bCtx, {
     type:'bar',
     data:{ labels:PILLAR_LABELS, datasets:cs.map((c,i)=>({ label:c.country, data:PILLARS.map(p=>c[p]||0), backgroundColor:palette[i].bg.replace('0.15','0.65').replace('0.12','0.65'), borderColor:palette[i].border, borderWidth:2, borderRadius:5 })) },
-    options:{ scales:{y:{beginAtZero:true,max:100,grid:{color:'rgba(26,107,181,0.07)'},ticks:{font:{family:'Poppins',size:8}}},x:{grid:{display:false},ticks:{font:{family:'Poppins',size:9}}}}, plugins:{legend:{position:'bottom',labels:{font:{family:'Poppins',size:10}}}}, responsive:true, maintainAspectRatio:window.innerWidth>768, aspectRatio:window.innerWidth>768?3:1.0}
+    options:{ scales:{y:{beginAtZero:true,max:100,grid:{color:'rgba(26,107,181,0.07)'},ticks:{font:{family:'Poppins',size:8}}},x:{grid:{display:false},ticks:{font:{family:'Poppins',size:9}}}}, plugins:{legend:{position:'bottom',labels:{font:{family:'Poppins',size:10}}}}, responsive:true, maintainAspectRatio:true, aspectRatio:window.innerWidth>768?3:2.1}
   });
 }
 
@@ -500,7 +500,7 @@ function renderInsightsPage() {
   charts.regionalPillar = new Chart(rpCtx, {
     type:'bar',
     data:{ labels:regions.map(r=>r.replace('& ','&\n')), datasets:regionPillarData },
-    options:{ scales:{y:{beginAtZero:true,max:100,grid:{color:'rgba(26,107,181,0.07)'},ticks:{font:{family:'Poppins',size:8}}},x:{grid:{display:false},ticks:{font:{family:'Poppins',size:8}}}}, plugins:{legend:{position:'bottom',labels:{font:{family:'Poppins',size:9}}}}, responsive:true, maintainAspectRatio: window.innerWidth>768, aspectRatio: window.innerWidth>768 ? 4 : 1.4 }
+    options:{ scales:{y:{beginAtZero:true,max:100,grid:{color:'rgba(26,107,181,0.07)'},ticks:{font:{family:'Poppins',size:8}}},x:{grid:{display:false},ticks:{font:{family:'Poppins',size:8}}}}, plugins:{legend:{position:'bottom',labels:{font:{family:'Poppins',size:9}}}}, responsive:true, maintainAspectRatio:true, aspectRatio:window.innerWidth>768?3:1.1}
   });
 
   const allSorted = [...GEI.countries].sort((a,b)=>(b.index_score||0)-(a.index_score||0));
@@ -553,7 +553,7 @@ function renderCambodiaPage() {
   charts.camRadar = new Chart(camRadarCtx, {
     type:'radar',
     data:{ labels:PILLAR_LABELS, datasets:peers.map((pName,i)=>{ const c=GEI.countries.find(x=>x.country===pName); if(!c) return null; return { label:pName, data:PILLARS.map(p=>c[p]||0), backgroundColor:`${peerColors[i]},0.12)`, borderColor:`${peerColors[i]},1)`, pointBackgroundColor:`${peerColors[i]},1)`, borderWidth:2, pointRadius:3 }; }).filter(Boolean) },
-    options:{ scales:{r:{min:0,max:100,ticks:{stepSize:20,font:{family:'Poppins',size:8}},pointLabels:{font:{family:'Poppins',size:9,weight:'600'}}}}, plugins:{legend:{position:'bottom',labels:{font:{family:'Poppins',size:10}}}}, responsive:true, maintainAspectRatio: window.innerWidth>768, aspectRatio: window.innerWidth>768 ? 3 : 1.2 }
+    options:{ scales:{r:{min:0,max:100,ticks:{stepSize:20,font:{family:'Poppins',size:8}},pointLabels:{font:{family:'Poppins',size:9,weight:'600'}}}}, plugins:{legend:{position:'bottom',labels:{font:{family:'Poppins',size:10}}}}, responsive:true, maintainAspectRatio:true, aspectRatio: window.innerWidth>768 ? 3:1.1}
   });
 }
 
